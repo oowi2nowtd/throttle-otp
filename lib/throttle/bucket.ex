@@ -8,7 +8,7 @@ defmodule Throttle.Bucket do
   Failure semantics: the bucket holds no durable state. If the process crashes
   and the DynamicSupervisor restarts it, the bucket comes back full. Callers
   that need a strict window should treat a restart as a reset rather than an
-  error, which is why `acquire/3` never blocks and never retries.
+  error, which is why `acquire/2` never blocks and never retries.
   """
 
   use GenServer
@@ -46,7 +46,8 @@ defmodule Throttle.Bucket do
     if state.tokens >= cost do
       {:reply, :ok, %{state | tokens: state.tokens - cost}}
     else
-      {:reply, {:error, :rate_limited, retry_after(cost - state.tokens, state.refill_interval_ms)}, state}
+      wait = retry_after(cost - state.tokens, state.refill_interval_ms)
+      {:reply, {:error, :rate_limited, wait}, state}
     end
   end
 
