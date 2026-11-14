@@ -35,7 +35,7 @@ the next `check/2` starts a fresh bucket.
 
 - A crashed bucket restarts full; limits are relaxed by at most one refill window.
 - `Throttle.Sweeper` terminates buckets that sit full and untouched for five
-  minutes (configurable), so one-off keys do not leak processes. Deficit buckets
+  minutes (configurable via start options), so one-off keys do not leak processes. Deficit buckets
   are kept.
 - All state is in memory. A VM restart resets every bucket.
 - The first caller decides a key's options. Later callers with different
@@ -64,6 +64,7 @@ lib/throttle/bucket.ex       token bucket GenServer and refill arithmetic
 lib/throttle/application.ex  registry, bucket supervisor, sweeper
 lib/throttle/sweeper.ex      drops idle full buckets
 test/throttle_test.exs       spend, refusal, refill, oversized cost
+test/throttle/sweeper_test.exs  idle, deficit, and fresh bucket cases
 ```
 
 ## License
