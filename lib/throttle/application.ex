@@ -7,7 +7,8 @@ defmodule Throttle.Application do
   def start(_type, _args) do
     children = [
       {Registry, keys: :unique, name: Throttle.Registry},
-      {DynamicSupervisor, name: Throttle.BucketSupervisor, strategy: :one_for_one}
+      {DynamicSupervisor, name: Throttle.BucketSupervisor, strategy: :one_for_one},
+      {Throttle.Sweeper, []}
     ]
 
     Supervisor.start_link(children, strategy: :one_for_one, name: Throttle.Supervisor)
