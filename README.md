@@ -34,6 +34,9 @@ Buckets are temporary children: the registry entry dies with the process, and
 the next `check/2` starts a fresh bucket.
 
 - A crashed bucket restarts full; limits are relaxed by at most one refill window.
+- `Throttle.Sweeper` terminates buckets that sit full and untouched for five
+  minutes (configurable), so one-off keys do not leak processes. Deficit buckets
+  are kept.
 - All state is in memory. A VM restart resets every bucket.
 - The first caller decides a key's options. Later callers with different
   options reuse the live bucket unchanged.
@@ -58,7 +61,8 @@ Requires Elixir 1.16+ / OTP 26+. Drop it in as a path dependency or copy
 ```
 lib/throttle.ex              public API: check/2, tokens/1, reset/1
 lib/throttle/bucket.ex       token bucket GenServer and refill arithmetic
-lib/throttle/application.ex  registry + bucket supervisor
+lib/throttle/application.ex  registry, bucket supervisor, sweeper
+lib/throttle/sweeper.ex      drops idle full buckets
 test/throttle_test.exs       spend, refusal, refill, oversized cost
 ```
 
